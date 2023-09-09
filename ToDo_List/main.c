@@ -47,6 +47,7 @@ int main() {
             default:
                 printf("Invalid choice. Please try again.\n");
         }
+        printf("\n");
     }
 
     return 0;
@@ -70,12 +71,14 @@ void addTodoItem() {
 }
 
 void viewTodoList() {
+    printf("\n");
     if (itemCount == 0) {
         printf("To-Do List is empty.\n");
         return;
     }
 
-    printf("\n===== To-Do List =====\n");
+    // printf("\n===== To-Do List =====\n");
+    printf("\n     **** To-Do List ****  \n");
     for (int i = 0; i < itemCount; i++) {
         printf("%d. Description: %s\n   Status: %s\n", i + 1, todoList[i].description, todoList[i].status);
     }
