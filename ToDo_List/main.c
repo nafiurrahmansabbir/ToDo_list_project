@@ -13,6 +13,7 @@ struct TodoItem todoList[100];
 int itemCount = 0;
 
 // Function prototypes
+void creadit();
 void displayMenu();
 void addTodoItem();
 void viewTodoList();
@@ -43,6 +44,7 @@ int main() {
                 saveToFile();
                 break;
             case 5:
+                creadit();
                 exit(0);
             default:
                 printf("Invalid choice. Please try again.\n");
@@ -51,6 +53,11 @@ int main() {
     }
 
     return 0;
+}
+
+void creadit(){
+    printf("\n***** Creadit *****\n");
+    printf("Program Devoloped by \nNafiur Rahman Sabbir\n");
 }
 
 void displayMenu() {
