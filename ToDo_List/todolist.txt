@@ -1,3 +1,0 @@
-I want to reading a book;Pending
-i want to buy a laptop;Completed
-I want buy a pc;Completed
