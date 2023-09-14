@@ -70,7 +70,8 @@ void addTodoItem() {
     }
 
     printf("Enter the description of the to-do item: ");
-    scanf(" %[^\n]", newItem->description);
+    // scanf(" %[^\n]", newItem->description);
+    scanf(" %s", newItem->description);
     strcpy(newItem->status, "Pending");
     newItem->next = NULL;
 
