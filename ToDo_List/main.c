@@ -2,24 +2,23 @@
 #include <stdlib.h>
 #include <string.h>
 
-// Define structure for a to-do item
 struct TodoItem {
     char description[100];
     char status[20];
+    struct TodoItem* next;
 };
 
-// Global variables
-struct TodoItem todoList[100];
-int itemCount = 0;
+// Global variable: head of the linked list
+struct TodoItem* head = NULL;
 
 // Function prototypes
-void creadit();
 void displayMenu();
 void addTodoItem();
 void viewTodoList();
 void markAsCompleted();
 void saveToFile();
 void loadFromFile();
+void freeList();
 
 int main() {
     loadFromFile();
@@ -44,20 +43,14 @@ int main() {
                 saveToFile();
                 break;
             case 5:
-                creadit();
+                freeList();
                 exit(0);
             default:
                 printf("Invalid choice. Please try again.\n");
         }
-        printf("\n");
     }
 
     return 0;
-}
-
-void creadit(){
-    printf("\n***** Creadit *****\n");
-    printf("Program Devoloped by \nNafiur Rahman Sabbir\n");
 }
 
 void displayMenu() {
@@ -67,37 +60,66 @@ void displayMenu() {
     printf("3. Mark Item as Completed\n");
     printf("4. Save To-Do List to File\n");
     printf("5. Exit\n");
+    printf("============================\n");
 }
 
 void addTodoItem() {
+    struct TodoItem* newItem = (struct TodoItem*)malloc(sizeof(struct TodoItem));
+    if (newItem == NULL) {
+        printf("Memory allocation failed.\n");
+        return;
+    }
+
     printf("Enter the description of the to-do item: ");
-    scanf(" %[^\n]", todoList[itemCount].description);
-    strcpy(todoList[itemCount].status, "Pending");
-    itemCount++;
+    scanf(" %[^\n]", newItem->description);
+    strcpy(newItem->status, "Pending");
+    newItem->next = NULL;
+
+    // Insert the new item at the beginning of the linked list
+    newItem->next = head;
+    head = newItem;
+
     printf("To-Do Item added successfully.\n");
 }
 
 void viewTodoList() {
-    printf("\n");
-    if (itemCount == 0) {
+    if (head == NULL) {
         printf("To-Do List is empty.\n");
         return;
     }
 
     // printf("\n===== To-Do List =====\n");
     printf("\n     **** To-Do List ****  \n");
-    for (int i = 0; i < itemCount; i++) {
-        printf("%d. Description: %s\n   Status: %s\n", i + 1, todoList[i].description, todoList[i].status);
+    struct TodoItem* current = head;
+    int index = 1;
+
+    while (current != NULL) {
+        printf("%d. Description: %s\n   Status: %s\n", index, current->description, current->status);
+        current = current->next;
+        index++;
     }
 }
 
 void markAsCompleted() {
+    if (head == NULL) {
+        printf("To-Do List is empty.\n");
+        return;
+    }
+
     int index;
     printf("Enter the index of the item to mark as completed: ");
     scanf("%d", &index);
 
-    if (index >= 1 && index <= itemCount) {
-        strcpy(todoList[index - 1].status, "Completed");
+    struct TodoItem* current = head;
+    int currentIndex = 1;
+
+    while (current != NULL && currentIndex < index) {
+        current = current->next;
+        currentIndex++;
+    }
+
+    if (current != NULL) {
+        strcpy(current->status, "Completed");
         printf("Item marked as completed.\n");
     } else {
         printf("Invalid index. Please try again.\n");
@@ -105,14 +127,17 @@ void markAsCompleted() {
 }
 
 void saveToFile() {
-    FILE *file = fopen("todolist.txt", "w");
+    FILE* file = fopen("todolist.txt", "w");
     if (file == NULL) {
         printf("Error opening the file.\n");
         return;
     }
 
-    for (int i = 0; i < itemCount; i++) {
-        fprintf(file, "%s;%s\n", todoList[i].description, todoList[i].status);
+    struct TodoItem* current = head;
+
+    while (current != NULL) {
+        fprintf(file, "%s;%s\n", current->description, current->status);
+        current = current->next;
     }
 
     fclose(file);
@@ -120,7 +145,7 @@ void saveToFile() {
 }
 
 void loadFromFile() {
-    FILE *file = fopen("todolist.txt", "r");
+    FILE* file = fopen("todolist.txt", "r");
     if (file == NULL) {
         printf("No saved To-Do List found.\n");
         return;
@@ -128,15 +153,37 @@ void loadFromFile() {
 
     char line[150];
     while (fgets(line, sizeof(line), file)) {
-        char *description = strtok(line, ";");
-        char *status = strtok(NULL, "\n");
+        struct TodoItem* newItem = (struct TodoItem*)malloc(sizeof(struct TodoItem));
+        if (newItem == NULL) {
+            printf("Memory allocation failed.\n");
+            return;
+        }
 
-        strcpy(todoList[itemCount].description, description);
-        strcpy(todoList[itemCount].status, status);
+        char* description = strtok(line, ";");
+        char* status = strtok(NULL, "\n");
 
-        itemCount++;
+        strcpy(newItem->description, description);
+        strcpy(newItem->status, status);
+        newItem->next = head;
+        head = newItem;
     }
 
     fclose(file);
     printf("To-Do List loaded from file.\n");
 }
+
+void freeList() {
+    struct TodoItem* current = head;
+
+    while (current != NULL) {
+        struct TodoItem* temp = current;
+        current = current->next;
+        free(temp);
+    }
+
+    head = NULL;
+}
+
+
+
+
